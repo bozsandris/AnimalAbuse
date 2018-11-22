@@ -9,7 +9,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -22,9 +21,12 @@ import android.widget.Toast;
 
 public class AnimalAbuseService extends AppCompatActivity implements LocationListener {
 
+    public static final String LONGITUDE = "Longitude";
+    public static final String LATITUDE = "Latitude";
     String longitude,latitude;
     LocationManager locationManager;
     TextView textView;
+    FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +36,13 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
         setSupportActionBar(toolbar);
         textView = findViewById(R.id.textview);
         CheckPermission();
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(),ReportService.class);
+                Intent intent = new Intent(getApplicationContext(),ReportActivity.class);
+                intent.putExtra(LONGITUDE,longitude);
+                intent.putExtra(LATITUDE,latitude);
                 startActivity(intent);
             }
         });
@@ -71,7 +75,10 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_login) {
+            return true;
+        }
+        if (id == R.id.action_help) {
             return true;
         }
 
@@ -108,11 +115,13 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
 
     @Override
     public void onProviderEnabled(String s) {
-    Toast.makeText(this,"Sikeres engedélyezés!",Toast.LENGTH_SHORT).show();
+        fab.setEnabled(true);
+        Toast.makeText(this,"Sikeres engedélyezés!",Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onProviderDisabled(String s) {
+        fab.setEnabled(false);
         Toast.makeText(this,"Kérlek kapcsold be a GPS-t",Toast.LENGTH_SHORT).show();
     }
 }

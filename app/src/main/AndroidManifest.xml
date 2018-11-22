@@ -21,13 +21,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ReportService"
+        <activity android:name=".ReportActivity"
             android:parentActivityName=".AnimalAbuseService">
             <meta-data android:name="android.support.PARENT_ACITIVITY"
                 android:value=".AnimalAbuseService" />
         </activity>
     </application>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-feature android:name="android.hardware.location.gps" />
     <uses-feature android:name="android.hardware.camera"
         android:required="true" />

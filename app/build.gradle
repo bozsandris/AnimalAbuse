@@ -15,6 +15,14 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug{
+            buildConfigField 'String', "Apikey", MongoDb_Apikey
+            resValue 'string', "api_key", MongoDb_Apikey
+            buildConfigField 'String', "DatabaseName", Db_Name
+            resValue 'string', "database_name", Db_Name
+            buildConfigField 'String', "CollectionName", Collection_Name
+            resValue 'string', "collection_name", Collection_Name
+        }
     }
 }
 
