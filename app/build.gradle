@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'android'
+            keyPassword 'android'
+            storeFile file('C:/Users/Bozsi/.android/debug.keystore')
+            storePassword 'android'
+        }
+    }
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.example.bozsi.animalabuse"
@@ -15,23 +23,27 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        debug{
+        debug {
             buildConfigField 'String', "Apikey", MongoDb_Apikey
             resValue 'string', "api_key", MongoDb_Apikey
             buildConfigField 'String', "DatabaseName", Db_Name
             resValue 'string', "database_name", Db_Name
             buildConfigField 'String', "CollectionName", Collection_Name
             resValue 'string', "collection_name", Collection_Name
+            signingConfig signingConfigs.config
         }
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'com.android.support:design:28.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'org.mongodb:mongodb-driver-sync:3.9.1'
+    implementation 'org.mongodb:mongodb-driver-legacy:3.9.1'
+    implementation 'org.mongodb:stitch-android-sdk:4.1.0'
 }

@@ -19,6 +19,17 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.stitch.android.core.Stitch;
+import com.mongodb.stitch.android.core.StitchAppClient;
+import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient;
+import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoCollection;
+
+import org.w3c.dom.Document;
+
 public class AnimalAbuseService extends AppCompatActivity implements LocationListener {
 
     public static final String LONGITUDE = "Longitude";
@@ -27,6 +38,7 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
     LocationManager locationManager;
     TextView textView;
     FloatingActionButton fab;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +79,25 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
         return true;
     }
 
+    public void login(){
+        MongoClientURI uri = new MongoClientURI("mongodb+srv://admin:<PASSWORD>@animalabuse-zn5gi.mongodb.net/test?retryWrites=true");
+        MongoClient mongoClient = new MongoClient(uri);
+        MongoDatabase database = mongoClient.getDatabase("Animalabuse");
+        MongoCollection collection = database.getCollection("Reports");
+        Document document = null;
+        collection.insertOne(document);
+
+        // Point to a MongoDB Atlas instance
+        StitchAppClient client = Stitch.getDefaultAppClient();
+        final RemoteMongoClient remoteMongoClient =
+                client.getServiceClient(RemoteMongoClient.factory,
+                        "mongodb-atlas");
+        // Point to an Atlas collection
+        RemoteMongoCollection remoteCollection = remoteMongoClient
+                .getDatabase("Animalabuse").getCollection("Reports");
+
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -76,7 +107,7 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_login) {
-            return true;
+            login();
         }
         if (id == R.id.action_help) {
             return true;

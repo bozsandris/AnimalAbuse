@@ -14,6 +14,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+
+import org.w3c.dom.Document;
+
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -85,7 +92,7 @@ public class ReportActivity extends AppCompatActivity {
             Report report = (Report) params[0];
             Log.d("Report", ""+report.getLatitude());
 
-            try {
+            /*try {
                 ReportController rc = new ReportController();
                 URL url = new URL(rc.buildReportsSaveURL());
 
@@ -118,7 +125,13 @@ public class ReportActivity extends AppCompatActivity {
                 e.getMessage();
                 Log.d("Got error", e.getMessage());
                 return false;
-            }
+            }*/
+            MongoClientURI uri = new MongoClientURI("mongodb+srv://admin:<PASSWORD>@animalabuse-zn5gi.mongodb.net/test?retryWrites=true");
+            MongoClient mongoClient = new MongoClient(uri);
+            MongoDatabase database = mongoClient.getDatabase("Animalabuse");
+            MongoCollection collection = database.getCollection("Reports");
+            Document document = (Document) report;
+            collection.insertOne(document);
         }
     }
 }
