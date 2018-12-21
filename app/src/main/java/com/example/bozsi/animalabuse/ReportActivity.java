@@ -62,8 +62,8 @@ public class ReportActivity extends AppCompatActivity {
             report.setLatitude(intent.getStringExtra(AnimalAbuseService.LATITUDE));
             report.setMessage(message.getText().toString());
 
-            MongoLabSaveReport tsk = new MongoLabSaveReport();
-            tsk.execute(report);
+            //MongoLabSaveReport tsk = new MongoLabSaveReport();
+            //tsk.execute(report);
 
             Toast.makeText(getApplicationContext(),"Report sent to the organization!",Toast.LENGTH_SHORT).show();
             }
@@ -86,7 +86,7 @@ public class ReportActivity extends AppCompatActivity {
         }
     }
 
-    final class MongoLabSaveReport extends AsyncTask<Object, Void, Boolean> {
+    /*final class MongoLabSaveReport extends AsyncTask<Object, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Object... params) {
             Report report = (Report) params[0];
@@ -125,7 +125,7 @@ public class ReportActivity extends AppCompatActivity {
                 e.getMessage();
                 Log.d("Got error", e.getMessage());
                 return false;
-            }*/
+            }
             MongoClientURI uri = new MongoClientURI("mongodb+srv://admin:<PASSWORD>@animalabuse-zn5gi.mongodb.net/test?retryWrites=true");
             MongoClient mongoClient = new MongoClient(uri);
             MongoDatabase database = mongoClient.getDatabase("Animalabuse");
@@ -133,5 +133,5 @@ public class ReportActivity extends AppCompatActivity {
             Document document = (Document) report;
             collection.insertOne(document);
         }
-    }
+    }*/
 }
