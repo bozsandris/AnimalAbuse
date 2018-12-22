@@ -31,11 +31,12 @@ public class LoginService extends AppCompatActivity {
             public void onClick(View view) {
                 if(!email.getText().toString().contains("@") || !email.getText().toString().contains("."))
                     Toast.makeText(LoginService.this, "Error! Probably you mistyped your email address.", Toast.LENGTH_SHORT).show();
+                else{
 
-                MongoClient mongoClient = new MongoClient("172.17.0.2:27017");
-                MongoDatabase database = mongoClient.getDatabase("test");
-                MongoCollection<Document> collection = database.getCollection("reports");
-                Document myDoc = collection.find(eq("username",email.getText())).first();
+                MongoClient mongoClient = new MongoClient("172.17.0.2",27017);
+                MongoDatabase database = mongoClient.getDatabase("demo");
+                MongoCollection<Document> collection = database.getCollection("users");
+                Document myDoc = collection.find(eq("username",email.getText().toString())).first();
 
                 if(password.getText().toString().equals(myDoc.getString("password")))
                     Toast.makeText(LoginService.this, "Error! Wrong password.", Toast.LENGTH_SHORT).show();
@@ -43,6 +44,7 @@ public class LoginService extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(),AnimalAbuseService.class);
                 intent.putExtra(EMAIL,email.getText());
                 startActivity(intent);}
+                }
             }
         });
     }
