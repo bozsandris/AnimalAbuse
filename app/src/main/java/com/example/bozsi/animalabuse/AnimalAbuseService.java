@@ -82,9 +82,13 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
 
     @Override
     public void onLocationChanged(Location location) {
-    longitude = String.valueOf(location.getLongitude());
-    latitude = String.valueOf(location.getLatitude());
-    textView.setText("Your current location:\nLongitude: "+longitude+"\n Latitude: "+latitude+"\nNow you can fill out your report by clicking the envelope button!");
+        fab.setEnabled(true);
+        fab.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#008577")));
+        warning.setVisibility(View.INVISIBLE);
+        textView.setVisibility(View.VISIBLE);
+        longitude = String.valueOf(location.getLongitude());
+        latitude = String.valueOf(location.getLatitude());
+        textView.setText("Your current location:\nLongitude: "+longitude+"\n Latitude: "+latitude+"\nNow you can fill out your report by clicking the envelope button!");
     }
 
     @Override
@@ -94,11 +98,8 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
 
     @Override
     public void onProviderEnabled(String s) {
-        fab.setEnabled(true);
-        fab.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#008577")));
         Toast.makeText(this,"GPS enabled!",Toast.LENGTH_SHORT).show();
-        warning.setVisibility(View.INVISIBLE);
-        textView.setVisibility(View.VISIBLE);
+
     }
 
     @Override
