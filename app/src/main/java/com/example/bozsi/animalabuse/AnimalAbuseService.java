@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -12,23 +14,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.mongodb.MongoClientURI;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.stitch.android.core.Stitch;
-import com.mongodb.stitch.android.core.StitchAppClient;
-import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoClient;
-import com.mongodb.stitch.android.services.mongodb.remote.RemoteMongoCollection;
-
-import org.w3c.dom.Document;
 
 public class AnimalAbuseService extends AppCompatActivity implements LocationListener {
 
@@ -38,6 +26,7 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
     String longitude,latitude,username;
     LocationManager locationManager;
     TextView textView;
+    TextView warning;
     FloatingActionButton fab;
 
 
@@ -46,6 +35,7 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_animal_abuse_service);
         textView = findViewById(R.id.textview);
+        warning = findViewById(R.id.warning);
         CheckPermission();
         final Intent loginintent = getIntent();
         username = loginintent.getStringExtra(LoginService.EMAIL);
@@ -74,13 +64,6 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
         locationManager.removeUpdates(this);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_animal_abuse, menu);
-        return true;
-    }
-
     public void getLocation(){
         try{
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -101,7 +84,7 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
     public void onLocationChanged(Location location) {
     longitude = String.valueOf(location.getLongitude());
     latitude = String.valueOf(location.getLatitude());
-    textView.setText("Your current location:\nLongitude: "+longitude+"\n Latitude: "+latitude);
+    textView.setText("Your current location:\nLongitude: "+longitude+"\n Latitude: "+latitude+"\nNow you can fill out your report by clicking the envelope button!");
     }
 
     @Override
@@ -112,12 +95,18 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
     @Override
     public void onProviderEnabled(String s) {
         fab.setEnabled(true);
-        Toast.makeText(this,"Sikeres engedélyezés!",Toast.LENGTH_SHORT).show();
+        fab.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#008577")));
+        Toast.makeText(this,"GPS enabled!",Toast.LENGTH_SHORT).show();
+        warning.setVisibility(View.INVISIBLE);
+        textView.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onProviderDisabled(String s) {
         fab.setEnabled(false);
-        Toast.makeText(this,"Kérlek kapcsold be a GPS-t",Toast.LENGTH_SHORT).show();
+        fab.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
+        Toast.makeText(this,"Please turn on GPS!",Toast.LENGTH_SHORT).show();
+        textView.setVisibility(View.INVISIBLE);
+        warning.setVisibility(View.VISIBLE);
     }
 }

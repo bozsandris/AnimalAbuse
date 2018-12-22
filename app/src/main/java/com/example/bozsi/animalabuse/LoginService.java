@@ -35,9 +35,9 @@ public class LoginService extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(!email.getText().toString().contains("@") || !email.getText().toString().contains("."))
-                   email.setError("Error! Probably you mistyped your email address.");
+                {email.setError("Error! Probably you mistyped your email address.");return;}
+                if(password.getText().toString().length()<5) {password.setError("Error! Password is min. 5 characters long!");return;}
                 else{
-
                 checkCredentials(email.getText().toString(),password.getText().toString());
                 }
             }

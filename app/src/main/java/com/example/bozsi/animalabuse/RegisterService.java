@@ -35,7 +35,9 @@ public class RegisterService extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(name.getText()==null) {name.setError("You can't leave this field empty!"); return;}
+                if(!name.getText().toString().contains(" ")) {name.setError("You should write your full name!"); return;}
                 if(email.getText()==null) {email.setError("You can't leave this field empty!"); return;}
+                if(!email.getText().toString().contains("@")){email.setError("You mistyped your email address!"); return;}
                 if(password.getText().length()<5) {password.setError("Your password must contain at least 5 characters"); return;}
                 register(name.getText().toString(),email.getText().toString(),password.getText().toString());
             }
