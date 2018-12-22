@@ -2,6 +2,7 @@ package com.example.bozsi.animalabuse;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +24,8 @@ public class LoginService extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.loginlayout);
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         final EditText email = findViewById(R.id.emailtext);
         final EditText password = findViewById(R.id.passwordtext);
         Button login = findViewById(R.id.login);
@@ -33,19 +36,22 @@ public class LoginService extends AppCompatActivity {
                     Toast.makeText(LoginService.this, "Error! Probably you mistyped your email address.", Toast.LENGTH_SHORT).show();
                 else{
 
-                MongoClient mongoClient = new MongoClient("172.17.0.2",27017);
-                MongoDatabase database = mongoClient.getDatabase("demo");
-                MongoCollection<Document> collection = database.getCollection("users");
-                Document myDoc = collection.find(eq("username",email.getText().toString())).first();
-
-                if(password.getText().toString().equals(myDoc.getString("password")))
-                    Toast.makeText(LoginService.this, "Error! Wrong password.", Toast.LENGTH_SHORT).show();
-                else{
-                Intent intent = new Intent(getApplicationContext(),AnimalAbuseService.class);
-                intent.putExtra(EMAIL,email.getText());
-                startActivity(intent);}
+                checkCredentials(email.getText().toString(),password.getText().toString());
                 }
             }
         });
+    }
+
+    private void checkCredentials(String email, String password){
+        MongoClient mongoClient = new MongoClient("172.17.0.2:27017");
+        MongoDatabase database = mongoClient.getDatabase("test");
+        MongoCollection<Document> collection = database.getCollection("reports");
+        Document myDoc = collection.find(eq("username",email)).first();
+        if(password.equals(myDoc.getString("password")))
+            Toast.makeText(getApplicationContext(), "Error! Wrong password.", Toast.LENGTH_SHORT).show();
+        else{
+            Intent intent = new Intent(getApplicationContext(),AnimalAbuseService.class);
+            intent.putExtra(EMAIL,email);
+            startActivity(intent);}
     }
 }
