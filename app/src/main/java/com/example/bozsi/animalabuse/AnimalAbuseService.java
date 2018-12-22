@@ -44,11 +44,11 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_animal_abuse_service);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         textView = findViewById(R.id.textview);
         CheckPermission();
-        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,25 +79,6 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
         return true;
     }
 
-    public void login(){
-        MongoClientURI uri = new MongoClientURI("mongodb+srv://admin:<PASSWORD>@animalabuse-zn5gi.mongodb.net/test?retryWrites=true");
-        MongoClient mongoClient = new MongoClient(uri);
-        MongoDatabase database = mongoClient.getDatabase("Animalabuse");
-        MongoCollection collection = database.getCollection("Reports");
-        Document document = null;
-        collection.insertOne(document);
-
-        // Point to a MongoDB Atlas instance
-        StitchAppClient client = Stitch.getDefaultAppClient();
-        final RemoteMongoClient remoteMongoClient =
-                client.getServiceClient(RemoteMongoClient.factory,
-                        "mongodb-atlas");
-        // Point to an Atlas collection
-        RemoteMongoCollection remoteCollection = remoteMongoClient
-                .getDatabase("Animalabuse").getCollection("Reports");
-
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -106,9 +87,6 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_login) {
-            login();
-        }
         if (id == R.id.action_help) {
             return true;
         }

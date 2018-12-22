@@ -2,12 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
-        config {
-            keyAlias 'android'
-            keyPassword 'android'
-            storeFile file('C:/Users/Bozsi/.android/debug.keystore')
-            storePassword 'android'
-        }
     }
     compileSdkVersion 28
     defaultConfig {
@@ -30,7 +24,6 @@ android {
             resValue 'string', "database_name", Db_Name
             buildConfigField 'String', "CollectionName", Collection_Name
             resValue 'string', "collection_name", Collection_Name
-            signingConfig signingConfigs.config
         }
     }
 }

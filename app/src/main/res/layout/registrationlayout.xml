@@ -12,13 +12,15 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="245dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/trans_white_rectangle"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp">
 
         <TextView
             android:id="@+id/textView"
@@ -27,7 +29,33 @@
             android:padding="10dp"
             android:text="Get Started"
             android:textColor="#FFFFFF"
-            android:textSize="16sp" />
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="Nobody will see your name,it's required because of security reasons."
+            android:textColor="#FFFFFF"
+            android:textSize="10sp" />
+
+        <EditText
+            android:id="@+id/editText2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/rounded_white"
+            android:drawableLeft="@drawable/ic_text_format"
+            android:ems="10"
+            android:hint="Name"
+            android:inputType="textEmailAddress"
+            android:padding="5dp"
+            android:paddingStart="10dp"
+            android:textAlignment="center"
+            android:textSize="18sp" />
 
         <EditText
             android:id="@+id/emailtext"

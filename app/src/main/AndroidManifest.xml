@@ -12,7 +12,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".AnimalAbuseService"
+            android:name=".LoginService"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -25,6 +25,11 @@
             android:parentActivityName=".AnimalAbuseService">
             <meta-data android:name="android.support.PARENT_ACITIVITY"
                 android:value=".AnimalAbuseService" />
+        </activity>
+        <activity android:name=".AnimalAbuseService"
+            android:parentActivityName=".LoginService">
+            <meta-data android:name="android.support.PARENT_ACITIVITY"
+                android:value=".LoginService" />
         </activity>
     </application>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
