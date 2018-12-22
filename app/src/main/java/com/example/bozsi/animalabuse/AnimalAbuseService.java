@@ -99,7 +99,6 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
     @Override
     public void onProviderEnabled(String s) {
         Toast.makeText(this,"GPS enabled!",Toast.LENGTH_SHORT).show();
-
     }
 
     @Override
