@@ -2,12 +2,12 @@ package com.example.bozsi.animalabuse;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,22 +15,23 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.mongodb.MongoClientURI;
-import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-import org.w3c.dom.Document;
+import org.bson.Document;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class ReportActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    String imageFilePath;
     ImageView mImageView;
-    String username;
+    String imagename;
     Bitmap imageBitmap;
 
     @Override
@@ -51,29 +52,52 @@ public class ReportActivity extends AppCompatActivity {
         report.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-            Report report = new Report();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                imageBitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
-                byte[]b = baos.toByteArray();
-                String image = Base64.encodeToString(b , Base64.DEFAULT);
-            report.setUsername("Guest");
-            report.setImage(image);
-            report.setLongitude(intent.getStringExtra(AnimalAbuseService.LONGITUDE));
-            report.setLatitude(intent.getStringExtra(AnimalAbuseService.LATITUDE));
-            report.setMessage(message.getText().toString());
-
-            //MongoLabSaveReport tsk = new MongoLabSaveReport();
-            //tsk.execute(report);
-
-            Toast.makeText(getApplicationContext(),"Report sent to the organization!",Toast.LENGTH_SHORT).show();
+            if(message.getText().length()==0) {message.setError("You must type at least a little message.");return;}
+            if(mImageView==null) {Toast.makeText(getApplicationContext(),"Please take a picture!",Toast.LENGTH_LONG).show();return;}
+            if(message.length()>50) {message.setError("Try to make your message shorter.50 characters should be enough to express yourself.");return;}
+            try {
+                    saveimage(intent.getStringExtra(AnimalAbuseService.USERNAME));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                saveToDb(intent.getStringExtra(AnimalAbuseService.USERNAME),intent.getStringExtra(AnimalAbuseService.LONGITUDE),
+                        intent.getStringExtra(AnimalAbuseService.LATITUDE),message.getText().toString());
             }
         });
+    }
+
+    private File createImageFile() throws IOException {
+        String timeStamp =
+                new SimpleDateFormat("yyyyMMdd_HHmmss",
+                        Locale.getDefault()).format(new Date());
+        String imageFileName = "IMG_" + timeStamp + "_";
+        File storageDir =
+                getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        imagename = imageFileName;
+        imageFilePath = image.getAbsolutePath();
+        return image;
     }
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            File photoFile = null;
+            try{
+                photoFile = createImageFile();
+            }
+            catch (IOException ex){
+                //error
+            }
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,"com.example.android.provider", photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
         }
     }
 
@@ -83,55 +107,39 @@ public class ReportActivity extends AppCompatActivity {
             Bundle extras = data.getExtras();
             imageBitmap = (Bitmap) extras.get("data");
             mImageView.setImageBitmap(imageBitmap);
+            try {
+                saveimage(imageFilePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    /*final class MongoLabSaveReport extends AsyncTask<Object, Void, Boolean> {
-        @Override
-        protected Boolean doInBackground(Object... params) {
-            Report report = (Report) params[0];
-            Log.d("Report", ""+report.getLatitude());
+    private void saveimage(String imageFilePath) throws IOException {
+        /*MongoClientURI connectionstring = new MongoClientURI("mongodb://192.168.2.156:27017");
+        com.mongodb.MongoClient mongoClient = new com.mongodb.MongoClient(connectionstring);
+        MongoDatabase database = mongoClient.getDatabase("test");
+        MongoCollection<Document> collection = database.getCollection("images");
+        GridFS gridFS = new GridFS(database,"photo");
+        File image = new File(imageFilePath);
+        GridFSInputFile gfsFile = gridFS.createFile(image);
+        gfsFile.setFilename(imagename);
+        gfsFile.save();*/
+    }
 
-            /*try {
-                ReportController rc = new ReportController();
-                URL url = new URL(rc.buildReportsSaveURL());
-
-                HttpURLConnection connection = (HttpURLConnection) url
-                        .openConnection();
-                connection.setRequestMethod("POST"); //put to update post do insert new
-                connection.setDoOutput(true);
-                connection.setRequestProperty("Content-Type",
-                        "application/json");
-                connection.setRequestProperty("Accept", "application/json");
-
-                OutputStreamWriter osw = new OutputStreamWriter(
-                        connection.getOutputStream());
-
-                osw.write(rc.createReport(report));
-                Log.d("Debug",osw.toString());
-                osw.flush();
-                osw.close();
-
-                if(connection.getResponseCode() <205)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-
-            } catch (Exception e) {
-                e.getMessage();
-                Log.d("Got error", e.getMessage());
-                return false;
-            }
-            MongoClientURI uri = new MongoClientURI("mongodb+srv://admin:<PASSWORD>@animalabuse-zn5gi.mongodb.net/test?retryWrites=true");
-            MongoClient mongoClient = new MongoClient(uri);
-            MongoDatabase database = mongoClient.getDatabase("Animalabuse");
-            MongoCollection collection = database.getCollection("Reports");
-            Document document = (Document) report;
-            collection.insertOne(document);
-        }
-    }*/
+    private void saveToDb(String username,String longitude,String latitude,String message){
+        MongoClientURI connectionstring = new MongoClientURI("mongodb://192.168.2.156:27017");
+        com.mongodb.MongoClient mongoClient = new com.mongodb.MongoClient(connectionstring);
+        MongoDatabase database = mongoClient.getDatabase("test");
+        MongoCollection<org.bson.Document> collection = database.getCollection("reports");
+        Document myDoc = new Document();
+        myDoc.append("username",username)
+                .append("longitude",longitude)
+                .append("latitude",latitude)
+                .append("message",message);
+        collection.insertOne(myDoc);
+        Toast.makeText(getApplicationContext(),"Report sent to the organization! Thanks for your contribution!",Toast.LENGTH_LONG).show();
+        Intent animalabuse = new Intent(getApplicationContext(),AnimalAbuseService.class);
+        startActivity(animalabuse);
+    }
 }

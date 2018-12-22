@@ -34,7 +34,8 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
 
     public static final String LONGITUDE = "Longitude";
     public static final String LATITUDE = "Latitude";
-    String longitude,latitude;
+    public static final String USERNAME = "Username";
+    String longitude,latitude,username;
     LocationManager locationManager;
     TextView textView;
     FloatingActionButton fab;
@@ -44,15 +45,16 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_animal_abuse_service);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         textView = findViewById(R.id.textview);
         CheckPermission();
+        final Intent loginintent = getIntent();
+        username = loginintent.getStringExtra(LoginService.EMAIL);
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(),ReportActivity.class);
+                intent.putExtra(USERNAME,username);
                 intent.putExtra(LONGITUDE,longitude);
                 intent.putExtra(LATITUDE,latitude);
                 startActivity(intent);
@@ -77,21 +79,6 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_animal_abuse, menu);
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_help) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void getLocation(){

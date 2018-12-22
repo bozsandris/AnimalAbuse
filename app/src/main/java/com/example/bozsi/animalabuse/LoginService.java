@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
@@ -29,29 +30,39 @@ public class LoginService extends AppCompatActivity {
         final EditText email = findViewById(R.id.emailtext);
         final EditText password = findViewById(R.id.passwordtext);
         Button login = findViewById(R.id.login);
+        Button register = findViewById(R.id.register);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(!email.getText().toString().contains("@") || !email.getText().toString().contains("."))
-                    Toast.makeText(LoginService.this, "Error! Probably you mistyped your email address.", Toast.LENGTH_SHORT).show();
+                   email.setError("Error! Probably you mistyped your email address.");
                 else{
 
                 checkCredentials(email.getText().toString(),password.getText().toString());
                 }
             }
         });
+        register.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Intent register = new Intent(getApplicationContext(),RegisterService.class);
+                startActivity(register);
+            }
+        });
     }
 
     private void checkCredentials(String email, String password){
-        MongoClient mongoClient = new MongoClient("localhost",27017);
+        MongoClientURI connectionstring = new MongoClientURI("mongodb://192.168.2.156:27017");
+        MongoClient mongoClient = new MongoClient(connectionstring);
         MongoDatabase database = mongoClient.getDatabase("test");
         MongoCollection<Document> collection = database.getCollection("users");
         Document myDoc = collection.find(eq("username",email)).first();
-        if(password.equals(myDoc.getString("password")))
+        if(myDoc == null) {Toast.makeText(getApplicationContext(), "Error! Can't find User!", Toast.LENGTH_SHORT).show();return;}
+        if(!password.equals(myDoc.getString("password")))
             Toast.makeText(getApplicationContext(), "Error! Wrong password.", Toast.LENGTH_SHORT).show();
         else{
-            Intent intent = new Intent(getApplicationContext(),AnimalAbuseService.class);
-            intent.putExtra(EMAIL,email);
-            startActivity(intent);}
+            Intent animalservice = new Intent(getApplicationContext(),AnimalAbuseService.class);
+            animalservice.putExtra(EMAIL,email);
+            startActivity(animalservice);}
     }
 }
