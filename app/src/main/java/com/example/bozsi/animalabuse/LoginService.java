@@ -43,9 +43,9 @@ public class LoginService extends AppCompatActivity {
     }
 
     private void checkCredentials(String email, String password){
-        MongoClient mongoClient = new MongoClient("172.17.0.2:27017");
+        MongoClient mongoClient = new MongoClient("localhost",27017);
         MongoDatabase database = mongoClient.getDatabase("test");
-        MongoCollection<Document> collection = database.getCollection("reports");
+        MongoCollection<Document> collection = database.getCollection("users");
         Document myDoc = collection.find(eq("username",email)).first();
         if(password.equals(myDoc.getString("password")))
             Toast.makeText(getApplicationContext(), "Error! Wrong password.", Toast.LENGTH_SHORT).show();
