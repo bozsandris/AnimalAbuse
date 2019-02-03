@@ -16,6 +16,10 @@ import com.mongodb.client.MongoDatabase;
 
 import org.bson.Document;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+
 import static com.mongodb.client.model.Filters.eq;
 
 public class RegisterService extends AppCompatActivity {
@@ -39,7 +43,11 @@ public class RegisterService extends AppCompatActivity {
                 if(email.getText()==null) {email.setError("You can't leave this field empty!"); return;}
                 if(!email.getText().toString().contains("@")){email.setError("You mistyped your email address!"); return;}
                 if(password.getText().length()<5) {password.setError("Your password must contain at least 5 characters"); return;}
-                register(name.getText().toString(),email.getText().toString(),password.getText().toString());
+                try {
+                    register(name.getText().toString(),email.getText().toString(),password.getText().toString());
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
             }
         });
         login.setOnClickListener(new View.OnClickListener() {
@@ -51,8 +59,8 @@ public class RegisterService extends AppCompatActivity {
         });
     }
 
-    private void register(String name,String email,String password){
-        //TODO átírni gradleproperties-be címet collections stb
+    private void register(String name,String email,String password) throws NoSuchAlgorithmException {
+        //TODO átírni gradleproperties-be címet collections stb + tesztelni a titkosítást
         MongoClientURI connectionstring = new MongoClientURI("mongodb://192.168.2.156:27017");
         MongoClient mongoClient = new MongoClient(connectionstring);
         MongoDatabase database = mongoClient.getDatabase("test");
@@ -60,10 +68,14 @@ public class RegisterService extends AppCompatActivity {
         Document myDoc = collection.find(eq("username",email)).first();
         if(myDoc==null)
         {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(password.getBytes());
+            byte[] digest = md.digest();
+            String myHash = Arrays.toString(digest).toUpperCase();
             myDoc= new Document("name",name);
             myDoc
                     .append("username",email)
-                    .append("password",password)
+                    .append("password",myHash)
                     .append("role", "guest");
             collection.insertOne(myDoc);
             Toast.makeText(getApplicationContext(),"User has been successfully registered!",Toast.LENGTH_SHORT).show();
