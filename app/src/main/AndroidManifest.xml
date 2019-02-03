@@ -31,7 +31,17 @@
             <meta-data android:name="android.support.PARENT_ACITIVITY"
                 android:value=".LoginService" />
         </activity>
+        <activity android:name=".AdminService"
+            android:parentActivityName=".LoginService">
+            <meta-data android:name="android.support.PARENT_ACITIVITY"
+                android:value=".LoginService" />
+        </activity>
         <activity android:name=".RegisterService"/>
+        <activity android:name=".ReportInfo"
+            android:parentActivityName=".AdminService">
+            <meta-data android:name="android.support.PARENT_ACITIVITY"
+                android:value=".AdminService" />
+        </activity>
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.provider"

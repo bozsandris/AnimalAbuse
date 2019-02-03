@@ -60,6 +60,10 @@ public class LoginService extends AppCompatActivity {
         if(myDoc == null) {Toast.makeText(getApplicationContext(), "Error! Can't find User!", Toast.LENGTH_SHORT).show();return;}
         if(!password.equals(myDoc.getString("password")))
             Toast.makeText(getApplicationContext(), "Error! Wrong password.", Toast.LENGTH_SHORT).show();
+        if(myDoc.getString("role")=="admin"){
+            Intent adminservice = new Intent(getApplicationContext(),AdminService.class);
+            startActivity(adminservice);
+        }
         else{
             Intent animalservice = new Intent(getApplicationContext(),AnimalAbuseService.class);
             animalservice.putExtra(EMAIL,email);

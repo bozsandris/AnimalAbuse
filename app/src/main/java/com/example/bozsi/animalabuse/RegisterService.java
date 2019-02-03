@@ -63,7 +63,8 @@ public class RegisterService extends AppCompatActivity {
             myDoc= new Document("name",name);
             myDoc
                     .append("username",email)
-                    .append("password",password);
+                    .append("password",password)
+                    .append("role", "guest");
             collection.insertOne(myDoc);
             Toast.makeText(getApplicationContext(),"User has been successfully registered!",Toast.LENGTH_SHORT).show();
             Intent login = new Intent(getApplicationContext(),LoginService.class);

@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -79,11 +80,14 @@ public class ReportActivity extends AppCompatActivity {
         MongoDatabase database = mongoClient.getDatabase("test");
         MongoCollection<org.bson.Document> collection = database.getCollection("reports");
         Document myDoc = new Document();
-        myDoc.append("username",username)
-                .append("image",image)
-                .append("longitude",longitude)
-                .append("latitude",latitude)
-                .append("message",message);
+        double[] loc = {Double.parseDouble(longitude),Double.parseDouble(latitude)};
+        myDoc.put("username",username);
+        myDoc.put("image",image);
+        BasicDBObject location = new BasicDBObject();
+        location.put("type", "Point");
+        location.put("coordinates",loc);
+        myDoc.put("loc",location);
+        myDoc.put("message",message);
         collection.insertOne(myDoc);
         Toast.makeText(getApplicationContext(),"Report sent to the organization! Thanks for your contribution!",Toast.LENGTH_LONG).show();
         Intent animalabuse = new Intent(getApplicationContext(),AnimalAbuseService.class);
