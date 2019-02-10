@@ -12,6 +12,7 @@
 
         <Button
             android:id="@+id/picture"
+            android:drawableLeft="@drawable/ic_add_a_photo"
             android:layout_width="match_parent"
             android:layout_height="53dp"
             android:layout_marginStart="8dp"

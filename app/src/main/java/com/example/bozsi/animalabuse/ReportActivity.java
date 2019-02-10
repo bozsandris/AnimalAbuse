@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,8 +16,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.geojson.Position;
 import com.mongodb.client.model.geojson.Point;
+import com.mongodb.client.model.geojson.Position;
 
 import org.bson.Document;
 
@@ -85,10 +84,6 @@ public class ReportActivity extends AppCompatActivity {
         Document myDoc = new Document();
         Position coordinates = new Position(Double.valueOf(longitude),Double.valueOf(latitude));
         Point location = new Point(coordinates);
-        //BasicDBObject location = new BasicDBObject();
-        //location.append("type", "Point");
-        //location.append("coordinates",loc);
-        BasicDBObject loc = new BasicDBObject();
         database.getCollection("reports").createIndex(new BasicDBObject("loc","2dsphere"));
         myDoc.append("username",username)
          .append("image",image)

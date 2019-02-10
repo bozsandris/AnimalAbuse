@@ -8,7 +8,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -40,10 +39,8 @@ public class AdminService extends AppCompatActivity implements LocationListener,
     LocationManager locationManager;
     TextView textView;
     TextView warning;
-    FloatingActionButton fab;
     Button list;
     TextView distance;
-    Button report1,report2,report3,report4,report5;
 
     private int findNear(CharSequence maxdistance) {
         MongoClientURI connectionstring = new MongoClientURI("mongodb://192.168.2.156:27017");
@@ -91,15 +88,16 @@ public class AdminService extends AppCompatActivity implements LocationListener,
         list.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                if(distance.getText().length()==0) {distance.setError("You must set the distance.");return;}
+                if(distance.getText().length()==0) {distance.requestFocus();distance.setError("You must set the distance.");return;}
                 int i=findNear(distance.getText());
                 list.setVisibility(View.INVISIBLE);
                 switch(i){
+                    case 0: Toast.makeText(getApplicationContext(),"No reports found!Try setting a larger distance!",Toast.LENGTH_LONG).show();
                     case 1: report1.setVisibility(View.VISIBLE);break;
-                    case 2: report2.setVisibility(View.VISIBLE);break;
-                    case 3: report3.setVisibility(View.VISIBLE);break;
-                    case 4: report4.setVisibility(View.VISIBLE);break;
-                    case 5: report5.setVisibility(View.VISIBLE);break;
+                    case 2: report1.setVisibility(View.VISIBLE);report2.setVisibility(View.VISIBLE);break;
+                    case 3: report1.setVisibility(View.VISIBLE);report2.setVisibility(View.VISIBLE);report3.setVisibility(View.VISIBLE);break;
+                    case 4: report1.setVisibility(View.VISIBLE);report2.setVisibility(View.VISIBLE);report3.setVisibility(View.VISIBLE);report4.setVisibility(View.VISIBLE);break;
+                    case 5: report1.setVisibility(View.VISIBLE);report2.setVisibility(View.VISIBLE);report3.setVisibility(View.VISIBLE);report4.setVisibility(View.VISIBLE);report5.setVisibility(View.VISIBLE);break;
                 }
             }
         });

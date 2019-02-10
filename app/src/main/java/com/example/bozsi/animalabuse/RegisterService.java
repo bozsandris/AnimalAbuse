@@ -60,7 +60,7 @@ public class RegisterService extends AppCompatActivity {
     }
 
     private void register(String name,String email,String password) throws NoSuchAlgorithmException {
-        //TODO átírni gradleproperties-be címet collections stb + tesztelni a titkosítást
+        //TODO átírni gradleproperties-be címet collections stb
         MongoClientURI connectionstring = new MongoClientURI("mongodb://192.168.2.156:27017");
         MongoClient mongoClient = new MongoClient(connectionstring);
         MongoDatabase database = mongoClient.getDatabase("test");

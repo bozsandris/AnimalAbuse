@@ -7,31 +7,26 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.util.Locale;
+import com.mongodb.BasicDBObject;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+
+import org.bson.Document;
 
 public class ReportInfo extends AppCompatActivity {
-
-    public static final String LONGITUDE = "Longitude";
-    public static final String LATITUDE = "Latitude";
-    public static final String USERNAME = "Username";
     String longitude,latitude,username,imagecode,messagetext;
-
-    FloatingActionButton fab;
-    TextView distance;
     Bitmap decodedImage;
     ImageView image;
-    ViewGroup.LayoutParams params=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +35,10 @@ public class ReportInfo extends AppCompatActivity {
         TextView userid = findViewById(R.id.userid);
         TextView location = findViewById(R.id.location);
         TextView message = findViewById(R.id.message);
+        final ImageView fullscreen = findViewById(R.id.imageView3);
+        final ConstraintLayout constraintLayout = findViewById(R.id.constraint2);
         image = findViewById(R.id.imageView2);
         final Intent reportdetails = getIntent();
-        //TODO imaget is megcsinálni
         username = reportdetails.getStringExtra(AdminService.USERNAME);
         userid.setText(username);
         longitude = reportdetails.getStringExtra(AdminService.LONGITUDE);
@@ -53,6 +49,7 @@ public class ReportInfo extends AppCompatActivity {
         byte[] imageBytes = Base64.decode(imagecode, Base64.DEFAULT);;
         decodedImage = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.length);
         image.setImageBitmap(decodedImage);
+        fullscreen.setImageBitmap(decodedImage);
          messagetext = reportdetails.getStringExtra(AdminService.MESSAGE);
          message.setText(messagetext);
 
@@ -60,8 +57,9 @@ public class ReportInfo extends AppCompatActivity {
         mark.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                //TODO Admin can mark it as dealt with,the report gets deleted from this collection
-                //and is being transferred @ the same time to another collection (for later tracing purposes)
+                deletefromDb(username,imagecode,messagetext);
+                Intent intent = new Intent(getApplicationContext(),AdminService.class);
+                startActivity(intent);
             }
         });
 
@@ -69,7 +67,6 @@ public class ReportInfo extends AppCompatActivity {
         open.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                String uri = String.format(Locale.ENGLISH, "geo:"+Double.valueOf(latitude)+","+Double.valueOf(longitude));
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?daddr="+latitude+","+longitude));
                 startActivity(intent);
             }
@@ -77,6 +74,16 @@ public class ReportInfo extends AppCompatActivity {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                fullscreen.setVisibility(View.VISIBLE);
+                constraintLayout.setVisibility(View.INVISIBLE);
+                fullScreen();
+            }
+        });
+        fullscreen.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                fullscreen.setVisibility(View.INVISIBLE);
+                constraintLayout.setVisibility(View.VISIBLE);
                 fullScreen();
             }
         });
@@ -96,11 +103,8 @@ public class ReportInfo extends AppCompatActivity {
                 ((uiOptions | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) == uiOptions);
         if (isImmersiveModeEnabled) {
             Log.i("TAG", "Turning immersive mode mode off. ");
-            image.setLayoutParams(params);
         } else {
             Log.i("TAG", "Turning immersive mode mode on.");
-            params = image.getLayoutParams();
-            image.setLayoutParams(new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT));
         }
 
         // Navigation bar hiding:  Backwards compatible to ICS.
@@ -127,6 +131,19 @@ public class ReportInfo extends AppCompatActivity {
 
         getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
         //END_INCLUDE (set_ui_flags)
+    }
+
+    private void deletefromDb(String username,String image,String message){
+        MongoClientURI connectionstring = new MongoClientURI("mongodb://192.168.2.156:27017");
+        com.mongodb.MongoClient mongoClient = new com.mongodb.MongoClient(connectionstring);
+        MongoDatabase database = mongoClient.getDatabase("test");
+        MongoCollection<Document> collection = database.getCollection("reports");
+        BasicDBObject query = new BasicDBObject();
+        query.put("username",username);
+        query.put("image",image);
+        query.put("message",message);
+        collection.deleteOne(query);
+        Toast.makeText(getApplicationContext(),"Report has been successfully removed from the database!",Toast.LENGTH_LONG).show();
     }
 
     @Override
