@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -47,37 +45,31 @@ public class AdminService extends AppCompatActivity implements LocationListener,
     TextView distance;
     Button report1,report2,report3,report4,report5;
 
-    private void findNear(CharSequence maxdistance) {
+    private int findNear(CharSequence maxdistance) {
         MongoClientURI connectionstring = new MongoClientURI("mongodb://192.168.2.156:27017");
         MongoClient mongoClient = new MongoClient(connectionstring);
         MongoDatabase database = mongoClient.getDatabase("test");
-        MongoCollection<Document> collection = database.getCollection("users");
-        Point refPoint = new Point(new Position( Float.parseFloat(longitude), Float.parseFloat(latitude)));
-        MongoCursor<Document> cursor = collection.find(Filters.near("contact.location", refPoint, Double.valueOf(maxdistance.toString()), 0.0)).iterator();
+        MongoCollection<Document> collection = database.getCollection("reports");
+        Point refPoint = new Point(new Position( Double.valueOf(longitude), Double.valueOf(latitude)));
+        MongoCursor<Document> cursor = collection.find(Filters.near("loc", refPoint, Double.valueOf(maxdistance.toString()), 0.0)).iterator();
         int i=0;
         try {
             while (cursor.hasNext() && i<5) {
                 Document doc = cursor.next();
-                String coordinates = doc.getString("coordinates");
-                coordinates = coordinates.substring(coordinates.indexOf("["),coordinates.indexOf("]"));
+                String coordinates = doc.get("loc").toString();
+                coordinates = coordinates.substring(coordinates.indexOf("[")+1,coordinates.indexOf("]"));
                 String [] coords = coordinates.split(",");
                 reports[i][0]=doc.getString("username");
                 reports[i][1]=coords[0];
                 reports[i][2]=coords[1];
                 reports[i][3]=doc.getString("image");
                 reports[i][4]=doc.getString("message");
-                switch(i){
-                 case 0: report1.setVisibility(View.VISIBLE);
-                 case 1: report2.setVisibility(View.VISIBLE);
-                 case 2: report3.setVisibility(View.VISIBLE);
-                 case 3: report4.setVisibility(View.VISIBLE);
-                 case 4: report5.setVisibility(View.VISIBLE);
-                 }
                 i++;
             }
         } finally {
             cursor.close();
             distance.setText("Nearby reports:");
+            return i;
         }
     }
 
@@ -90,20 +82,32 @@ public class AdminService extends AppCompatActivity implements LocationListener,
         warning = findViewById(R.id.warning);
         CheckPermission();
         distance = findViewById(R.id.maxdistance);
-        Button report1 = findViewById(R.id.report1);
-        Button report2 = findViewById(R.id.report2);
-        Button report3 = findViewById(R.id.report3);
-        Button report4 = findViewById(R.id.report4);
-        Button report5 = findViewById(R.id.report5);
+        final Button report1 = findViewById(R.id.report1);
+        final Button report2 = findViewById(R.id.report2);
+        final Button report3 = findViewById(R.id.report3);
+        final Button report4 = findViewById(R.id.report4);
+        final Button report5 = findViewById(R.id.report5);
         list = findViewById(R.id.button);
         list.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                findNear(distance.getText());
+                if(distance.getText().length()==0) {distance.setError("You must set the distance.");return;}
+                int i=findNear(distance.getText());
                 list.setVisibility(View.INVISIBLE);
+                switch(i){
+                    case 1: report1.setVisibility(View.VISIBLE);break;
+                    case 2: report2.setVisibility(View.VISIBLE);break;
+                    case 3: report3.setVisibility(View.VISIBLE);break;
+                    case 4: report4.setVisibility(View.VISIBLE);break;
+                    case 5: report5.setVisibility(View.VISIBLE);break;
+                }
             }
         });
         report1.setOnClickListener(this);
+        report2.setOnClickListener(this);
+        report3.setOnClickListener(this);
+        report4.setOnClickListener(this);
+        report5.setOnClickListener(this);
     }
 
     @Override
@@ -136,13 +140,11 @@ public class AdminService extends AppCompatActivity implements LocationListener,
 
     @Override
     public void onLocationChanged(Location location) {
-        fab.setEnabled(true);
-        fab.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#008577")));
         warning.setVisibility(View.INVISIBLE);
         textView.setVisibility(View.VISIBLE);
         longitude = String.valueOf(location.getLongitude());
         latitude = String.valueOf(location.getLatitude());
-        textView.setText("Your current location:\nLongitude: "+longitude+"\n Latitude: "+latitude+"\nNow you can fill out your report by clicking the envelope button!");
+        textView.setText("Your current location:\nLongitude: "+longitude+"\nLatitude: "+latitude);
         list.setEnabled(true);
     }
 
@@ -158,8 +160,6 @@ public class AdminService extends AppCompatActivity implements LocationListener,
 
     @Override
     public void onProviderDisabled(String s) {
-        fab.setEnabled(false);
-        fab.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
         Toast.makeText(this,"Please turn on GPS!",Toast.LENGTH_SHORT).show();
         textView.setVisibility(View.INVISIBLE);
         warning.setVisibility(View.VISIBLE);

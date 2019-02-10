@@ -16,6 +16,10 @@ import com.mongodb.client.MongoDatabase;
 
 import org.bson.Document;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+
 import static com.mongodb.client.model.Filters.eq;
 
 public class LoginService extends AppCompatActivity {
@@ -38,7 +42,7 @@ public class LoginService extends AppCompatActivity {
                 {email.setError("Error! Probably you mistyped your email address.");return;}
                 if(password.getText().toString().length()<5) {password.setError("Error! Password is min. 5 characters long!");return;}
                 else{
-                checkCredentials(email.getText().toString(),password.getText().toString());
+                    checkCredentials(email.getText().toString(),password.getText().toString());
                 }
             }
         });
@@ -51,16 +55,25 @@ public class LoginService extends AppCompatActivity {
         });
     }
 
-    private void checkCredentials(String email, String password){
+    protected void checkCredentials(String email, String password) {
         MongoClientURI connectionstring = new MongoClientURI("mongodb://192.168.2.156:27017");
         MongoClient mongoClient = new MongoClient(connectionstring);
         MongoDatabase database = mongoClient.getDatabase("test");
         MongoCollection<Document> collection = database.getCollection("users");
         Document myDoc = collection.find(eq("username",email)).first();
         if(myDoc == null) {Toast.makeText(getApplicationContext(), "Error! Can't find User!", Toast.LENGTH_SHORT).show();return;}
-        if(!password.equals(myDoc.getString("password")))
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        md.update(password.getBytes());
+        byte[] digest = md.digest();
+        String myHash = Arrays.toString(digest).toUpperCase();
+        if(!myHash.equals(myDoc.getString("password")))
             Toast.makeText(getApplicationContext(), "Error! Wrong password.", Toast.LENGTH_SHORT).show();
-        if(myDoc.getString("role")=="admin"){
+        else if(myDoc.getString("role").equals("admin")){
             Intent adminservice = new Intent(getApplicationContext(),AdminService.class);
             startActivity(adminservice);
         }
@@ -69,4 +82,5 @@ public class LoginService extends AppCompatActivity {
             animalservice.putExtra(EMAIL,email);
             startActivity(animalservice);}
     }
+
 }

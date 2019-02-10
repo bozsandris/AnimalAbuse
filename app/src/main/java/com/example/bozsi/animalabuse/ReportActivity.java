@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +17,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.geojson.Position;
+import com.mongodb.client.model.geojson.Point;
 
 import org.bson.Document;
 
@@ -80,14 +83,17 @@ public class ReportActivity extends AppCompatActivity {
         MongoDatabase database = mongoClient.getDatabase("test");
         MongoCollection<org.bson.Document> collection = database.getCollection("reports");
         Document myDoc = new Document();
-        double[] loc = {Double.parseDouble(longitude),Double.parseDouble(latitude)};
-        myDoc.put("username",username);
-        myDoc.put("image",image);
-        BasicDBObject location = new BasicDBObject();
-        location.put("type", "Point");
-        location.put("coordinates",loc);
-        myDoc.put("loc",location);
-        myDoc.put("message",message);
+        Position coordinates = new Position(Double.valueOf(longitude),Double.valueOf(latitude));
+        Point location = new Point(coordinates);
+        //BasicDBObject location = new BasicDBObject();
+        //location.append("type", "Point");
+        //location.append("coordinates",loc);
+        BasicDBObject loc = new BasicDBObject();
+        database.getCollection("reports").createIndex(new BasicDBObject("loc","2dsphere"));
+        myDoc.append("username",username)
+         .append("image",image)
+         .append("loc", location)
+         .append("message",message);
         collection.insertOne(myDoc);
         Toast.makeText(getApplicationContext(),"Report sent to the organization! Thanks for your contribution!",Toast.LENGTH_LONG).show();
         Intent animalabuse = new Intent(getApplicationContext(),AnimalAbuseService.class);
