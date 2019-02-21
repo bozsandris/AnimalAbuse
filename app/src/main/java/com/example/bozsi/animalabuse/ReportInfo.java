@@ -134,7 +134,7 @@ public class ReportInfo extends AppCompatActivity {
     }
 
     private void deletefromDb(String username,String image,String message){
-        MongoClientURI connectionstring = new MongoClientURI("mongodb://192.168.2.156:27017");
+        MongoClientURI connectionstring = new MongoClientURI(BuildConfig.Db_ip);
         com.mongodb.MongoClient mongoClient = new com.mongodb.MongoClient(connectionstring);
         MongoDatabase database = mongoClient.getDatabase("test");
         MongoCollection<Document> collection = database.getCollection("reports");

@@ -77,7 +77,7 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private void saveToDb(String username,String image,String longitude,String latitude,String message){
-        MongoClientURI connectionstring = new MongoClientURI("mongodb://192.168.2.156:27017");
+        MongoClientURI connectionstring = new MongoClientURI(BuildConfig.Db_ip);
         com.mongodb.MongoClient mongoClient = new com.mongodb.MongoClient(connectionstring);
         MongoDatabase database = mongoClient.getDatabase("test");
         MongoCollection<org.bson.Document> collection = database.getCollection("reports");

@@ -56,7 +56,7 @@ public class LoginService extends AppCompatActivity {
     }
 
     protected void checkCredentials(String email, String password) {
-        MongoClientURI connectionstring = new MongoClientURI("mongodb://192.168.2.156:27017");
+        MongoClientURI connectionstring = new MongoClientURI(BuildConfig.Db_ip);
         MongoClient mongoClient = new MongoClient(connectionstring);
         MongoDatabase database = mongoClient.getDatabase("test");
         MongoCollection<Document> collection = database.getCollection("users");

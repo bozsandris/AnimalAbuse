@@ -43,7 +43,7 @@ public class AdminService extends AppCompatActivity implements LocationListener,
     TextView distance;
 
     private int findNear(CharSequence maxdistance) {
-        MongoClientURI connectionstring = new MongoClientURI("mongodb://192.168.2.156:27017");
+        MongoClientURI connectionstring = new MongoClientURI(BuildConfig.Db_ip);
         MongoClient mongoClient = new MongoClient(connectionstring);
         MongoDatabase database = mongoClient.getDatabase("test");
         MongoCollection<Document> collection = database.getCollection("reports");

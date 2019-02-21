@@ -18,8 +18,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            buildConfigField 'String', "DatabaseName", Db_Name
-            resValue 'string', "database_name", Db_Name
+            buildConfigField 'String', "Db_ip", Db_ip
+            resValue 'string',"mongodb://192.168.2.156:27017", Db_ip
         }
     }
 }
