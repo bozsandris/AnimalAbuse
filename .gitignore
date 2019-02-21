@@ -123,6 +123,8 @@ atlassian-ide-plugin.xml
 
 app/build.gradle
 
+*.gradle
+
 gradle.properties
 
 # Crashlytics plugin (for Android Studio and IntelliJ)
