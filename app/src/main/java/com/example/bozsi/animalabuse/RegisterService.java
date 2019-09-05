@@ -60,24 +60,23 @@ public class RegisterService extends AppCompatActivity {
     }
 
     private void register(String name,String email,String password) throws NoSuchAlgorithmException {
-        //TODO átírni gradleproperties-be címet collections stb
         MongoClientURI connectionstring = new MongoClientURI(BuildConfig.Db_ip);
         MongoClient mongoClient = new MongoClient(connectionstring);
         MongoDatabase database = mongoClient.getDatabase("test");
         MongoCollection<Document> collection = database.getCollection("users");
-        Document myDoc = collection.find(eq("username",email)).first();
-        if(myDoc==null)
+        Document user = collection.find(eq("username",email)).first();
+        if(user==null)
         {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(password.getBytes());
             byte[] digest = md.digest();
             String myHash = Arrays.toString(digest).toUpperCase();
-            myDoc= new Document("name",name);
-            myDoc
+            user= new Document("name",name);
+            user
                     .append("username",email)
                     .append("password",myHash)
-                    .append("role", "admin");
-            collection.insertOne(myDoc);
+                    .append("role", "guest");
+            collection.insertOne(user);
             Toast.makeText(getApplicationContext(),"User has been successfully registered!",Toast.LENGTH_SHORT).show();
             Intent login = new Intent(getApplicationContext(),LoginService.class);
             startActivity(login);

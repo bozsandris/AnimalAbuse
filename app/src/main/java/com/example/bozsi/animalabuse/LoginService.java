@@ -60,8 +60,8 @@ public class LoginService extends AppCompatActivity {
         MongoClient mongoClient = new MongoClient(connectionstring);
         MongoDatabase database = mongoClient.getDatabase("test");
         MongoCollection<Document> collection = database.getCollection("users");
-        Document myDoc = collection.find(eq("username",email)).first();
-        if(myDoc == null) {Toast.makeText(getApplicationContext(), "Error! Can't find User!", Toast.LENGTH_SHORT).show();return;}
+        Document user = collection.find(eq("username",email)).first();
+        if(user == null) {Toast.makeText(getApplicationContext(), "Error! Can't find User!", Toast.LENGTH_SHORT).show();return;}
         MessageDigest md = null;
         try {
             md = MessageDigest.getInstance("MD5");
@@ -71,9 +71,9 @@ public class LoginService extends AppCompatActivity {
         md.update(password.getBytes());
         byte[] digest = md.digest();
         String myHash = Arrays.toString(digest).toUpperCase();
-        if(!myHash.equals(myDoc.getString("password")))
+        if(!myHash.equals(user.getString("password")))
             Toast.makeText(getApplicationContext(), "Error! Wrong password.", Toast.LENGTH_SHORT).show();
-        else if(myDoc.getString("role").equals("admin")){
+        else if(user.getString("role").equals("admin")){
             Intent adminservice = new Intent(getApplicationContext(),AdminService.class);
             startActivity(adminservice);
         }

@@ -50,7 +50,7 @@ public class ReportActivity extends AppCompatActivity {
             if(message.getText().length()==0) {message.setError("You must type at least a little message.");return;}
             if(imageBitmap==null) {Toast.makeText(getApplicationContext(),"Please take a picture!",Toast.LENGTH_LONG).show();return;}
             if(message.length()>50) {message.setError("Try to make your message shorter.50 characters should be enough to express yourself.");return;}
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 imageBitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
                 byte[]b = baos.toByteArray();
                 String image = Base64.encodeToString(b , Base64.DEFAULT);

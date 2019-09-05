@@ -103,7 +103,7 @@ public class AnimalAbuseService extends AppCompatActivity implements LocationLis
 
     @Override
     public void onProviderDisabled(String s) {
-        fab.setEnabled(false);
+        fab.setEnabled(false); //Can't process to the report interface
         fab.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
         Toast.makeText(this,"Please turn on GPS!",Toast.LENGTH_SHORT).show();
         textView.setVisibility(View.INVISIBLE);
